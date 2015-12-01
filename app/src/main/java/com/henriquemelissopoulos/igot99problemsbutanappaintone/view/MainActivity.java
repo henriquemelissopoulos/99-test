@@ -12,6 +12,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,7 +23,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.R;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Bus;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Config;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.network.Service;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.databinding.ActivityMainBinding;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.model.Taxi;
+
+import java.util.ArrayList;
+
+import de.greenrobot.event.EventBus;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -35,15 +45,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if(!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
         if (savedInstanceState == null) {
             mapFragment.setRetainInstance(true);
         }
-
         mapFragment.getMapAsync(this);
+
+        binding.fabRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Service.getInstance().getTaxis();
+            }
+        });
     }
 
 
@@ -82,6 +101,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    public void onEventMainThread(Bus<ArrayList<Taxi>> bus) {
+
+        if (bus.key == Config.GET_TAXI_LIST) {
+
+            if (bus.error) {
+                Toast.makeText(this, R.string.general_error_message, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            for (Taxi taxi : bus.data) {
+                Log.d("taxibus", taxi.getDriverId() + ":= lat: " + taxi.getLatitude() + " long: " + taxi.getLongitude());
+            }
+        }
+    }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -93,6 +128,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 zoomUser();
             }
         }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
 }
