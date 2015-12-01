@@ -71,7 +71,6 @@ public class API {
         }
     }
 
-
     public EndpointInterface service() {
         return REST_ADAPTER.create(EndpointInterface.class);
     }
@@ -80,7 +79,7 @@ public class API {
     public interface EndpointInterface {
 
         //List of taxis
-        @GET("lastLocations/")
+        @GET("lastLocations")
         Call<ArrayList<Taxi>> taxis(
                 @Query("sw") String sw,
                 @Query("ne") String ne);
