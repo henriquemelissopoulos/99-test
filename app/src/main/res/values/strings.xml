@@ -1,3 +1,8 @@
 <resources>
+
     <string name="app_name">IGot99ProblemsButAnAppAintOne</string>
+
+    <!-- GENERAL -->
+    <string name="general_permission_ask">Me dá permissão, por favor? :(</string>
+
 </resources>
