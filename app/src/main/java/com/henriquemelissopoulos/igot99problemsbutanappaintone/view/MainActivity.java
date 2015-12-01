@@ -1,4 +1,4 @@
-package com.henriquemelissopoulos.igot99problemsbutanappaintone;
+package com.henriquemelissopoulos.igot99problemsbutanappaintone.view;
 
 import android.Manifest;
 import android.content.Context;
@@ -19,6 +19,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.R;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
