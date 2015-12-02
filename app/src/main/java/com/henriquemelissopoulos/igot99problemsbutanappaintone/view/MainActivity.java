@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,10 +21,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.R;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Bus;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Config;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.network.Service;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.utils.LatLngInterpolator;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.utils.Utils99;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.databinding.ActivityMainBinding;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.model.Taxi;
 
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 1;
 
     GoogleMap map;
+    ArrayList<Taxi> taxis = new ArrayList<>();
     ActivityMainBinding binding;
 
 
@@ -101,6 +104,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    public void addTaxiMarkers() {
+        for (Taxi taxi : taxis) {
+            if (taxi.getMarker() == null)
+                taxi.setMarker(map.addMarker(new MarkerOptions()
+                        .position(new LatLng(taxi.getLatitude(), taxi.getLongitude()))
+                        .title(String.valueOf(taxi.getDriverId()))));
+
+            Utils99.animateMarker(taxi.getMarker(), new LatLng(taxi.getLatitude(), taxi.getLongitude()), new LatLngInterpolator.Spherical());
+        }
+    }
+    
+
     public void onEventMainThread(Bus<ArrayList<Taxi>> bus) {
 
         if (bus.key == Config.GET_TAXI_LIST) {
@@ -110,9 +125,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return;
             }
 
-            for (Taxi taxi : bus.data) {
-                Log.d("taxibus", taxi.getDriverId() + ":= lat: " + taxi.getLatitude() + " long: " + taxi.getLongitude());
+
+            Main: for (Taxi taxi : taxis) {
+                for (Taxi busTaxi : bus.data) {
+                    if (taxi.getDriverId() == busTaxi.getDriverId()) { //if it's the same taxi, update values
+                        taxi.setLatitude(busTaxi.getLatitude());
+                        taxi.setLongitude(busTaxi.getLongitude());
+                        bus.data.remove(busTaxi);
+                        continue Main; //Go to next main list's taxi
+                    }
+                }
             }
+
+            taxis.addAll(bus.data);
+
+            addTaxiMarkers();
         }
     }
 
