@@ -21,7 +21,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
@@ -117,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (map != null && userLocation != null) {
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
+                    .target(Utils99.toLatLng(userLocation.getLatitude(), userLocation.getLongitude()))
                     .zoom(15)
                     .build();
 
@@ -130,11 +129,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Taxi taxi : taxis) {
             if (taxi.getMarker() == null)
                 taxi.setMarker(map.addMarker(new MarkerOptions()
-                        .position(new LatLng(taxi.getLatitude(), taxi.getLongitude()))
+                        .position(Utils99.toLatLng(taxi.getLatitude(), taxi.getLongitude()))
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_circle_black_24dp))
                         .title(String.valueOf(taxi.getDriverId()))));
 
-            Utils99.animateMarker(taxi.getMarker(), new LatLng(taxi.getLatitude(), taxi.getLongitude()), new LatLngInterpolator.Spherical());
+            Utils99.animateMarker(taxi.getMarker(), Utils99.toLatLng(taxi.getLatitude(), taxi.getLongitude()), new LatLngInterpolator.Spherical());
         }
 
         //TODO clusterManager.addItems(taxis);

@@ -3,6 +3,7 @@ package com.henriquemelissopoulos.igot99problemsbutanappaintone.model;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterItem;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.utils.Utils99;
 
 /**
  * Created by h on 01/12/15.
@@ -58,6 +59,6 @@ public class Taxi implements ClusterItem {
 
     @Override
     public LatLng getPosition() {
-        return new LatLng(getLatitude(), getLongitude());
+        return Utils99.toLatLng(getLatitude(), getLongitude());
     }
 }

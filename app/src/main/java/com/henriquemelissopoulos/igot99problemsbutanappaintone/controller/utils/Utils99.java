@@ -24,4 +24,8 @@ public class Utils99 {
         animator.setDuration(3000);
         animator.start();
     }
+
+    public static LatLng toLatLng(double lat, double lon) {
+        return new LatLng(lat, lon);
+    }
 }
