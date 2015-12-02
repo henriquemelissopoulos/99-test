@@ -33,6 +33,8 @@ import com.henriquemelissopoulos.igot99problemsbutanappaintone.databinding.Activ
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.model.Taxi;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.greenrobot.event.EventBus;
 
@@ -64,14 +66,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         binding.fabRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (map != null) {
-                    LatLngBounds maplatLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
-                    String sw = String.valueOf(maplatLngBounds.southwest.latitude) + "," + String.valueOf(maplatLngBounds.southwest.longitude);
-                    String ne = String.valueOf(maplatLngBounds.northeast.latitude) + "," + String.valueOf(maplatLngBounds.northeast.longitude);
-                    Service.getInstance().getTaxis(sw, ne);
-                }
+                requestTaxis();
             }
         });
+
+        Timer timer = new Timer();
+        timer.schedule(new RequestTaxisTimerTask(), 10, 5000);
+    }
+
+
+    public void requestTaxis() {
+        if (map != null) {
+            LatLngBounds maplatLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
+            String sw = String.valueOf(maplatLngBounds.southwest.latitude) + "," + String.valueOf(maplatLngBounds.southwest.longitude);
+            String ne = String.valueOf(maplatLngBounds.northeast.latitude) + "," + String.valueOf(maplatLngBounds.northeast.longitude);
+            Service.getInstance().getTaxis(sw, ne);
+        }
     }
 
 
@@ -168,6 +178,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+
+    class RequestTaxisTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    requestTaxis();
+                }
+            });
+        }
     }
 
 }
