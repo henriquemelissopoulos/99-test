@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void requestTaxis() {
         if (map != null) {
+            binding.fabRefresh.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate));
             LatLngBounds maplatLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
             String sw = String.valueOf(maplatLngBounds.southwest.latitude) + "," + String.valueOf(maplatLngBounds.southwest.longitude);
             String ne = String.valueOf(maplatLngBounds.northeast.latitude) + "," + String.valueOf(maplatLngBounds.northeast.longitude);
@@ -94,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.getUiSettings().setZoomControlsEnabled(false);
         map.getUiSettings().setMyLocationButtonEnabled(false);
         map.getUiSettings().setCompassEnabled(false);
+        map.getUiSettings().setMapToolbarEnabled(false);
 
         clusterManager = new ClusterManager<>(this, map);
         map.setOnCameraChangeListener(clusterManager);
@@ -141,14 +144,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void onEventMainThread(Bus<ArrayList<Taxi>> bus) {
-
         if (bus.key == Config.GET_TAXI_LIST) {
 
             if (bus.error) {
                 Toast.makeText(this, R.string.general_error_message, Toast.LENGTH_SHORT).show();
                 return;
             }
-
 
             Main: for (Taxi taxi : taxis) {
                 for (Taxi busTaxi : bus.data) {
@@ -162,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
 
             taxis.addAll(bus.data);
-
             addTaxiMarkers();
         }
     }
