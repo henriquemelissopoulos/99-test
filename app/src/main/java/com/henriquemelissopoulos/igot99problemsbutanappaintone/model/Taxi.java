@@ -1,14 +1,19 @@
 package com.henriquemelissopoulos.igot99problemsbutanappaintone.model;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.maps.android.clustering.ClusterItem;
+
 /**
  * Created by h on 01/12/15.
  */
-public class Taxi {
+public class Taxi implements ClusterItem {
 
     private double latitude;
     private double longitude;
     private int driverId;
     private boolean driverAvailable;
+    private Marker marker;
 
 
     public double getLatitude() {
@@ -41,5 +46,18 @@ public class Taxi {
 
     public void setDriverAvailable(boolean driverAvailable) {
         this.driverAvailable = driverAvailable;
+    }
+
+    public Marker getMarker() {
+        return marker;
+    }
+
+    public void setMarker(Marker marker) {
+        this.marker = marker;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return new LatLng(getLatitude(), getLongitude());
     }
 }

@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -20,16 +19,24 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.R;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Bus;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Config;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.network.Service;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.utils.LatLngInterpolator;
+import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.utils.Utils99;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.databinding.ActivityMainBinding;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.model.Taxi;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.greenrobot.event.EventBus;
 
@@ -38,7 +45,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 1;
 
     GoogleMap map;
+    ArrayList<Taxi> taxis = new ArrayList<>();
     ActivityMainBinding binding;
+    ClusterManager<Taxi> clusterManager;
 
 
     @Override
@@ -60,9 +69,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         binding.fabRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Service.getInstance().getTaxis("-23.612474,-46.702746", "-23.589548,-46.673392"); //TODO hardcoded
+                requestTaxis();
             }
         });
+
+        Timer timer = new Timer();
+        timer.schedule(new RequestTaxisTimerTask(), 10, 5000);
+    }
+
+
+    public void requestTaxis() {
+        if (map != null) {
+            LatLngBounds maplatLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
+            String sw = String.valueOf(maplatLngBounds.southwest.latitude) + "," + String.valueOf(maplatLngBounds.southwest.longitude);
+            String ne = String.valueOf(maplatLngBounds.northeast.latitude) + "," + String.valueOf(maplatLngBounds.northeast.longitude);
+            Service.getInstance().getTaxis(sw, ne);
+        }
     }
 
 
@@ -73,6 +95,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.getUiSettings().setZoomControlsEnabled(false);
         map.getUiSettings().setMyLocationButtonEnabled(false);
         map.getUiSettings().setCompassEnabled(false);
+
+        clusterManager = new ClusterManager<>(this, map);
+        map.setOnCameraChangeListener(clusterManager);
 
         zoomUser();
     }
@@ -101,6 +126,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    public void addTaxiMarkers() {
+        for (Taxi taxi : taxis) {
+            if (taxi.getMarker() == null)
+                taxi.setMarker(map.addMarker(new MarkerOptions()
+                        .position(new LatLng(taxi.getLatitude(), taxi.getLongitude()))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_circle_black_24dp))
+                        .title(String.valueOf(taxi.getDriverId()))));
+
+            Utils99.animateMarker(taxi.getMarker(), new LatLng(taxi.getLatitude(), taxi.getLongitude()), new LatLngInterpolator.Spherical());
+        }
+
+        //TODO clusterManager.addItems(taxis);
+    }
+
+
     public void onEventMainThread(Bus<ArrayList<Taxi>> bus) {
 
         if (bus.key == Config.GET_TAXI_LIST) {
@@ -110,9 +150,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return;
             }
 
-            for (Taxi taxi : bus.data) {
-                Log.d("taxibus", taxi.getDriverId() + ":= lat: " + taxi.getLatitude() + " long: " + taxi.getLongitude());
+
+            Main: for (Taxi taxi : taxis) {
+                for (Taxi busTaxi : bus.data) {
+                    if (taxi.getDriverId() == busTaxi.getDriverId()) { //if it's the same taxi, update values
+                        taxi.setLatitude(busTaxi.getLatitude());
+                        taxi.setLongitude(busTaxi.getLongitude());
+                        bus.data.remove(busTaxi);
+                        continue Main; //Go to next main list's taxi
+                    }
+                }
             }
+
+            taxis.addAll(bus.data);
+
+            addTaxiMarkers();
         }
     }
 
@@ -135,6 +187,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+
+    class RequestTaxisTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    requestTaxis();
+                }
+            });
+        }
     }
 
 }
