@@ -19,6 +19,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (taxi.getMarker() == null)
                 taxi.setMarker(map.addMarker(new MarkerOptions()
                         .position(new LatLng(taxi.getLatitude(), taxi.getLongitude()))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_circle_black_24dp))
                         .title(String.valueOf(taxi.getDriverId()))));
 
             Utils99.animateMarker(taxi.getMarker(), new LatLng(taxi.getLatitude(), taxi.getLongitude()), new LatLngInterpolator.Spherical());
