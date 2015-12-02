@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.android.databinding'
 apply plugin: 'io.fabric'
+apply plugin: 'com.android.databinding'
 
 android {
 
@@ -70,6 +70,10 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     lintOptions {
         abortOnError false
     }
@@ -89,7 +93,7 @@ dependencies {
     compile 'com.squareup.retrofit:adapter-rxjava:2.0.0-beta2'
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.0.16'
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {transitive = true}
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.3@aar') { transitive = true; }
 
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test:runner:0.4'
