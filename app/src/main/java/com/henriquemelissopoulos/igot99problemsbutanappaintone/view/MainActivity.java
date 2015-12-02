@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         binding.fabRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Service.getInstance().getTaxis();
+                Service.getInstance().getTaxis("-23.612474,-46.702746", "-23.589548,-46.673392"); //TODO hardcoded
             }
         });
     }

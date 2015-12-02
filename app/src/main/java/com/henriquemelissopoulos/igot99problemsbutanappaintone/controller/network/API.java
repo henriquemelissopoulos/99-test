@@ -82,7 +82,7 @@ public class API {
 
         //List of taxis
         @GET("lastLocations")
-        Observable<ArrayList<Taxi>> taxis(
+        Observable<ArrayList<Taxi>> getTaxis(
                 @Query("sw") String sw,
                 @Query("ne") String ne);
     }

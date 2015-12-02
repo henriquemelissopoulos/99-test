@@ -25,9 +25,9 @@ public class Service {
         return instance;
     }
 
-    public void getTaxis() {
+    public void getTaxis(String sw, String ne) {
 
-        new API().service().taxis("-23.612474,-46.702746", "-23.589548,-46.673392") //TODO hardcoded
+        new API().service().getTaxis(sw, ne)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ArrayList<Taxi>>() {
