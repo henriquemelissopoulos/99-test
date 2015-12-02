@@ -28,10 +28,23 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled false
         }
+
+        release {
+            versionNameSuffix "-RELEASE"
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+        }
     }
 
     signingConfigs {
         debug {
+            storeFile rootProject.file('keystore.jks')
+            storePassword "8YFYR3O2DIE8XWC"
+            keyAlias "99"
+            keyPassword "8YFYR3O2DIE8XWC"
+        }
+
+        release {
             storeFile rootProject.file('keystore.jks')
             storePassword "8YFYR3O2DIE8XWC"
             keyAlias "99"
