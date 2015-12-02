@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.R;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Bus;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Config;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     GoogleMap map;
     ArrayList<Taxi> taxis = new ArrayList<>();
     ActivityMainBinding binding;
+    ClusterManager<Taxi> clusterManager;
 
 
     @Override
@@ -94,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.getUiSettings().setMyLocationButtonEnabled(false);
         map.getUiSettings().setCompassEnabled(false);
 
+        clusterManager = new ClusterManager<>(this, map);
+        map.setOnCameraChangeListener(clusterManager);
+
         zoomUser();
     }
 
@@ -131,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             Utils99.animateMarker(taxi.getMarker(), new LatLng(taxi.getLatitude(), taxi.getLongitude()), new LatLngInterpolator.Spherical());
         }
+
+        //TODO clusterManager.addItems(taxis);
     }
 
 
