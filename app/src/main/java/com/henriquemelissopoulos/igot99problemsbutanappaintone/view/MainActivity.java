@@ -21,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.R;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Bus;
@@ -63,7 +64,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         binding.fabRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Service.getInstance().getTaxis("-23.612474,-46.702746", "-23.589548,-46.673392"); //TODO hardcoded
+                if (map != null) {
+                    LatLngBounds maplatLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
+                    String sw = String.valueOf(maplatLngBounds.southwest.latitude) + "," + String.valueOf(maplatLngBounds.southwest.longitude);
+                    String ne = String.valueOf(maplatLngBounds.northeast.latitude) + "," + String.valueOf(maplatLngBounds.northeast.longitude);
+                    Service.getInstance().getTaxis(sw, ne);
+                }
             }
         });
     }
@@ -114,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Utils99.animateMarker(taxi.getMarker(), new LatLng(taxi.getLatitude(), taxi.getLongitude()), new LatLngInterpolator.Spherical());
         }
     }
-    
+
 
     public void onEventMainThread(Bus<ArrayList<Taxi>> bus) {
 
