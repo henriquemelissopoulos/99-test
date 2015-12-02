@@ -17,11 +17,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
+import retrofit.RxJavaCallAdapterFactory;
 import retrofit.http.GET;
 import retrofit.http.Query;
+import rx.Observable;
 
 /**
  * Created by h on 01/12/15.
@@ -67,6 +68,7 @@ public class API {
                     .baseUrl(Config.BASE_URL)
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                     .build();
         }
     }
@@ -80,7 +82,7 @@ public class API {
 
         //List of taxis
         @GET("lastLocations")
-        Call<ArrayList<Taxi>> taxis(
+        Observable<ArrayList<Taxi>> taxis(
                 @Query("sw") String sw,
                 @Query("ne") String ne);
     }

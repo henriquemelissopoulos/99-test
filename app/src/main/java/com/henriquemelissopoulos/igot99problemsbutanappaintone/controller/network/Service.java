@@ -1,7 +1,5 @@
 package com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.network;
 
-import android.util.Log;
-
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Bus;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.controller.Config;
 import com.henriquemelissopoulos.igot99problemsbutanappaintone.model.Taxi;
@@ -9,7 +7,9 @@ import com.henriquemelissopoulos.igot99problemsbutanappaintone.model.Taxi;
 import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
-import retrofit.Call;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by h on 01/12/15.
@@ -26,22 +26,25 @@ public class Service {
     }
 
     public void getTaxis() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
 
-                try {
-                    Call<ArrayList<Taxi>> shotsCall = new API().service().taxis("-23.612474,-46.702746", "-23.589548,-46.673392"); //Hardcoded for now
-                    ArrayList<Taxi> taxis = shotsCall.execute().body();
+        new API().service().taxis("-23.612474,-46.702746", "-23.589548,-46.673392") //TODO hardcoded
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ArrayList<Taxi>>() {
 
-                    EventBus.getDefault().post(new Bus<ArrayList<Taxi>>(Config.GET_TAXI_LIST).data(taxis));
+                    @Override
+                    public void onError(Throwable e) {
+                        EventBus.getDefault().post(new Bus<ArrayList<Taxi>>(Config.GET_TAXI_LIST).error(true).info(e.toString()));
+                        e.printStackTrace();
+                    }
 
-                } catch (Exception e) {
-                    EventBus.getDefault().post(new Bus<ArrayList<Taxi>>(Config.GET_TAXI_LIST).error(true).info(e.toString()));
-                    Log.d("service", "Failure on getTaxis");
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+                    @Override
+                    public void onNext(ArrayList<Taxi> taxis) {
+                        EventBus.getDefault().post(new Bus<ArrayList<Taxi>>(Config.GET_TAXI_LIST).data(taxis));
+                    }
+
+                    @Override
+                    public void onCompleted() {}
+                });
     }
 }
