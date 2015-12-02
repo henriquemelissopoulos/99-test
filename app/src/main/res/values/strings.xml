@@ -4,5 +4,7 @@
 
     <!-- GENERAL -->
     <string name="general_permission_ask">Me dá permissão, por favor? :(</string>
+    <string name="general_error_message">Ocorreu um erro, por favor tente novamente mais tarde.</string>
+
 
 </resources>
