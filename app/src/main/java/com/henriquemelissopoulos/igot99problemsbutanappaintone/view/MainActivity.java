@@ -69,12 +69,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
+        //Set Map Fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (savedInstanceState == null) {
             mapFragment.setRetainInstance(true);
         }
         mapFragment.getMapAsync(this);
 
+
+        //Fab Button to refresh taxis
         binding.fabRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        //Fab button to project github webpage
         binding.fabGit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+
+        //TimerTask to request and update taxis in 5-5 seconds
         Timer timer = new Timer();
         timer.schedule(new RequestTaxisTimerTask(), 10, 5000);
     }
