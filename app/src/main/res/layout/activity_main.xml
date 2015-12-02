@@ -17,15 +17,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabRefresh"
             style="@style/Fab"
+            android:src="@drawable/ic_refresh_white_24dp"
+            android:layout_above="@+id/fabGit"
+            android:layout_alignLeft="@+id/fabGit"
+            android:layout_alignStart="@+id/fabGit" />
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabGit"
+            style="@style/Fab"
+            android:src="@drawable/ic_code_white_24dp"
+            bind:backgroundTint="@color/colorPrimaryDark"
             android:layout_margin="16dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:src="@drawable/ic_refresh_white_24dp"
-            app:rippleColor="@color/colorPrimaryDark"/>
+            android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
 </layout>
